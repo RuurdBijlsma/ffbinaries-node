@@ -322,7 +322,7 @@ function downloadUrls(components, urls, opts, callback) {
             });
           } else {
             // Log an error message if the response is not successful
-            console.error('Failed to download file:', response.statusMessage);
+            console.error('Failed to download file:', url, response);
           }
         });
 
