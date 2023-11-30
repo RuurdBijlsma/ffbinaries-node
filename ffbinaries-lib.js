@@ -5,7 +5,9 @@ var _ = require('lodash');
 var async = require('async');
 var childProcess = require('child_process');
 var extractZip = require('extract-zip');
-var http = require('http')
+var http = require('http');
+var fetch = require('node-fetch');
+const fs = require('fs');
 
 var API_URL = 'https://ffbinaries.com/api/v1';
 
@@ -131,21 +133,24 @@ function listVersions(callback) {
   if (RUNTIME_CACHE.versionsAll) {
     return callback(null, RUNTIME_CACHE.versionsAll);
   }
-  fetch(API_URL + url).then(r => r.text().then(body => {
+  fetch(API_URL)
+    .then(r => r.text()
+      .then((body) => {
+        var parsed;
 
-      var parsed;
+        try {
+          parsed = JSON.parse(body.toString());
+        } catch (e) {
+          return callback(errorMsgs.parsingVersionList);
+        }
 
-      try {
-        parsed = JSON.parse(body.toString());
-      } catch (e) {
-        return callback(errorMsgs.parsingVersionList);
-      }
-
-      var versionsAll = Object.keys(parsed.versions);
-      RUNTIME_CACHE.versionsAll = versionsAll;
-      return callback(null, versionsAll);
-    }).catch(e => console.warn('json err', e))
-  ).catch(e => console.warn("fetch err", e))
+        var versionsAll = Object.keys(parsed.versions);
+        RUNTIME_CACHE.versionsAll = versionsAll;
+        return callback(null, versionsAll);
+      })
+      .catch(e => console.warn('json err', e))
+    )
+    .catch(e => console.warn('fetch err', e));
 }
 
 /**
@@ -162,20 +167,24 @@ function getVersionData(version, callback) {
 
   var url = version ? '/version/' + version : '/latest';
 
-  fetch(API_URL + url).then(r => r.text().then(body => {
+  fetch(API_URL + url)
+    .then(r => r.text()
+      .then((body) => {
 
-      var parsed;
+        var parsed;
 
-      try {
-        parsed = JSON.parse(body.toString());
-      } catch (e) {
-        return callback(errorMsgs.parsingVersionData);
-      }
+        try {
+          parsed = JSON.parse(body.toString());
+        } catch (e) {
+          return callback(errorMsgs.parsingVersionData);
+        }
 
-      RUNTIME_CACHE[version] = parsed;
-      return callback(null, parsed);
-    }).catch(e => console.warn('json err', e))
-  ).catch(e => console.warn("fetch err", e))
+        RUNTIME_CACHE[version] = parsed;
+        return callback(null, parsed);
+      })
+      .catch(e => console.warn('json err', e))
+    )
+    .catch(e => console.warn('fetch err', e));
 }
 
 /**
@@ -204,7 +213,10 @@ function downloadUrls(components, urls, opts, callback) {
 
   function extractZipToDestination(zipFilename, cb) {
     var oldpath = path.join(LOCAL_CACHE_DIR, zipFilename);
-    extractZip(oldpath, {dir: destinationDir, defaultFileMode: parseInt('744', 8)}, cb);
+    extractZip(oldpath, {
+      dir: destinationDir,
+      defaultFileMode: parseInt('744', 8)
+    }, cb);
   }
 
 
@@ -215,7 +227,8 @@ function downloadUrls(components, urls, opts, callback) {
 
     var url = urlObject.url;
 
-    var zipFilename = url.split('/').pop();
+    var zipFilename = url.split('/')
+      .pop();
     var binFilenameBase = urlObject.component;
     var binFilename = getBinaryFilename(binFilenameBase, opts.platform || detectPlatform());
     var runningTotal = 0;
@@ -225,7 +238,10 @@ function downloadUrls(components, urls, opts, callback) {
     if (typeof opts.tickerFn === 'function') {
       opts.tickerInterval = parseInt(opts.tickerInterval, 10);
       var tickerInterval = (!Number.isNaN(opts.tickerInterval)) ? opts.tickerInterval : 1000;
-      var tickData = {filename: zipFilename, progress: 0};
+      var tickData = {
+        filename: zipFilename,
+        progress: 0
+      };
 
       // Schedule next ticks
       interval = setInterval(function () {
@@ -450,7 +466,8 @@ function locateBinariesSync(components, opts) {
       var stdout = childProcess.spawnSync(result.path, ['-version']).stdout;
       // if stdout.length === 0, then we must have stderr instead
       if (stdout && stdout.length) {
-        result.version = stdout.toString().split(' ')[2];
+        result.version = stdout.toString()
+          .split(' ')[2];
       }
     }
 

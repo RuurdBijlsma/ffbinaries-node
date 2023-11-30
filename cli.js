@@ -24,7 +24,8 @@ function displayHelp() {
     'Downloads binaries for ffmpeg, ffprobe, ffplay and ffserver.',
     '',
     'Available platforms:',
-    ' ' + ffbinaries.listPlatforms().join(', '),
+    ' ' + ffbinaries.listPlatforms()
+      .join(', '),
     '',
     'To see what versions are available type:',
     ' ffbinaries versions',
@@ -64,7 +65,8 @@ function displayDownloadFilesResult(err, data) {
     return process.exit(1);
   }
   console.log('Destination:', data[0].path);
-  console.log('Files downloaded:', _.map(data, 'filename').join(', '));
+  console.log('Files downloaded:', _.map(data, 'filename')
+    .join(', '));
 
   console.log('------------------------------------');
   console.log('Binaries downloaded and extracted.');
