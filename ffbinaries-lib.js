@@ -5,8 +5,7 @@ var _ = require('lodash');
 var async = require('async');
 var childProcess = require('child_process');
 var extractZip = require('extract-zip');
-var http = require('http');
-var fetch = require('node-fetch');
+var http = require('https');
 const fs = require('fs');
 
 var API_URL = 'https://ffbinaries.com/api/v1';
