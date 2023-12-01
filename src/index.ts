@@ -1,28 +1,29 @@
-import { downloadFile, exists, fetchJson } from "./utils.js";
+import {downloadFile, exists, fetchJson} from "./utils.js";
 import path from "path";
 import os from "os";
 import extractZip from "extract-zip";
 import fs from "fs/promises";
+import {exec} from "child_process";
 
 const API_URL = `https://ffbinaries.com/api/v1`;
 
 export async function downloadBinaries(
-  {
-      destination = ".",
-      components = ["ffmpeg", "ffprobe", "ffplay"],
-      version = "latest",
-      overwrite = false,
-      onProgress = () => {
-      },
-      tempDirectory = destination
-  }: {
-      destination?: string,
-      components?: ("ffmpeg" | "ffprobe" | "ffplay")[],
-      version?: string,
-      overwrite?: boolean,
-      onProgress?: (x: number) => void,
-      tempDirectory?: string
-  }
+    {
+        destination = ".",
+        components = ["ffmpeg", "ffprobe", "ffplay"],
+        version = "latest",
+        overwrite = false,
+        onProgress = () => {
+        },
+        tempDirectory = destination
+    }: {
+        destination?: string,
+        components?: ("ffmpeg" | "ffprobe" | "ffplay")[],
+        version?: string,
+        overwrite?: boolean,
+        onProgress?: (x: number) => void,
+        tempDirectory?: string
+    }
 ) {
     let componentData = components.map(c => ({
         component: c,
@@ -49,27 +50,30 @@ export async function downloadBinaries(
     let progressFn = (p: { progress: number }, index: number) => {
         progresses[index] = p.progress;
         onProgress(
-          progresses.reduce((acc, v) => acc + v) / progresses.length
+            progresses.reduce((acc, v) => acc + v) / progresses.length
         );
     };
     await Promise.all(
-      validComponents.map(async (data, index) => {
-          await downloadFile(
-            urls[data.component],
-            data.zipPath,
-            p => progressFn(p, index)
-          );
-          await extractZip(data.zipPath, {
-              dir: path.resolve(tempDirectory)
-          });
-          await fs.unlink(data.zipPath);
-          await fs.rename(data.tempFilePath, data.filePath);
-      })
+        validComponents.map(async (data, index) => {
+            await downloadFile(
+                urls[data.component],
+                data.zipPath,
+                p => progressFn(p, index)
+            );
+            await extractZip(data.zipPath, {
+                dir: path.resolve(tempDirectory)
+            });
+            await fs.unlink(data.zipPath);
+            if (detectPlatform().startsWith('linux')) {
+                exec('chmod +x ' + data.tempFilePath);
+            }
+            await fs.rename(data.tempFilePath, data.filePath);
+        })
     );
 
     return Object.fromEntries(componentData
-      .filter(c => urls.hasOwnProperty(c.component))
-      .map(data => [data.component, data.filePath]));
+        .filter(c => urls.hasOwnProperty(c.component))
+        .map(data => [data.component, data.filePath]));
 }
 
 export function getVersionData(version: string) {
@@ -81,7 +85,7 @@ export function getVersionData(version: string) {
 
 export async function listVersions() {
     return Object.keys(
-      (await fetchJson<{ [key: string]: string }>(API_URL)).versions
+        (await fetchJson<{ [key: string]: string }>(API_URL)).versions
     );
 }
 
