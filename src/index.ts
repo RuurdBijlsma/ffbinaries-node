@@ -43,7 +43,6 @@ export async function downloadBinaries(
         throw new Error("Got invalid json from ffbinaries api");
 
     let urls = versionData["bin"][platform];
-    console.log({ urls, missingComponents });
     let validComponents = missingComponents.filter(c => urls.hasOwnProperty(c.component));
 
     let progresses = validComponents.map(() => 0);
