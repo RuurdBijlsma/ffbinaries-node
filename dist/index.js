@@ -65,7 +65,6 @@ async function downloadBinaries({
   if (!versionData["bin"].hasOwnProperty(platform))
     throw new Error("Got invalid json from ffbinaries api");
   let urls = versionData["bin"][platform];
-  console.log({ urls, missingComponents });
   let validComponents = missingComponents.filter((c) => urls.hasOwnProperty(c.component));
   let progresses = validComponents.map(() => 0);
   let progressFn = (p, index) => {
@@ -85,6 +84,8 @@ async function downloadBinaries({
         dir: path.resolve(tempDirectory)
       });
       await fs2.unlink(data.zipPath);
+      if (detectPlatform().startsWith("linux"))
+        await fs2.chmod(data.tempFilePath, "+x");
       await fs2.rename(data.tempFilePath, data.filePath);
     })
   );
