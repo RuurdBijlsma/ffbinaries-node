@@ -2,10 +2,15 @@
   "name": "ff-binaries-2",
   "version": "0.1.0",
   "description": "Gets ffmpeg / ffprobe / ffplay binaries for you.",
-  "main": "src/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test:watch": "nodemon --inspect src/test/test-ffbinaries.js",
-    "build": "rimraf ./build && tsc"
+    "build": "tsup"
   },
   "type": "module",
   "repository": {
@@ -31,10 +36,11 @@
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
+    "tsup": "^8.0.1",
     "typescript": "^5.3.2"
   },
   "author": "Ruurd Bijlsma",
-  "license": "MIT",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/ruurdbijlsma/ff-binaries-2/issues"
   },

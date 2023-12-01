@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     /* Projects */
-    "incremental": true,
+    "incremental": false,
     /* Save .tsbuildinfo files to allow for incremental compilation of projects. */
     /* Language and Environment */
     "target": "ES2020",
