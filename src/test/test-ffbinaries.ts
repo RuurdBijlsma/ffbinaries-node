@@ -27,18 +27,18 @@ test("get version data", async () => {
     assert.strictEqual(data.hasOwnProperty("bin"), true);
 });
 
-test('download binaries', async () => {
+test("download binaries", async () => {
     let files = await ffBinaries.downloadBinaries({
-        components: ['ffmpeg'],
-        destination: './',
+        components: ["ffmpeg"],
+        destination: "./",
         onProgress: p => console.log("Progress", p),
-        overwrite: true,
-    })
+        overwrite: true
+    });
     console.log(files);
-    assert.ok(files.hasOwnProperty('ffmpeg'));
-    let fileExists = await exists(files['ffmpeg'])
+    assert.ok(files.hasOwnProperty("ffmpeg"));
+    let fileExists = await exists(files["ffmpeg"]);
     assert.ok(fileExists);
-    let fileStat = await fs.stat(files['ffmpeg'])
+    let fileStat = await fs.stat(files["ffmpeg"]);
     // check if file larger than 10 MB to see if it's not empty
-    assert.ok(fileStat.size > 10000000)
-})
+    assert.ok(fileStat.size > 10000000);
+});

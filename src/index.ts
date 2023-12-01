@@ -1,9 +1,8 @@
-import {downloadFile, exists, fetchJson} from "./utils.js";
+import { downloadFile, exists, fetchJson } from "./utils.js";
 import path from "path";
 import os from "os";
 import extractZip from "extract-zip";
 import fs from "fs/promises";
-import {exec} from "child_process";
 
 const API_URL = `https://ffbinaries.com/api/v1`;
 
@@ -64,9 +63,8 @@ export async function downloadBinaries(
                 dir: path.resolve(tempDirectory)
             });
             await fs.unlink(data.zipPath);
-            if (detectPlatform().startsWith('linux')) {
-                exec('chmod +x ' + data.tempFilePath);
-            }
+            if (detectPlatform().startsWith("linux"))
+                await fs.chmod(data.tempFilePath, "+x");
             await fs.rename(data.tempFilePath, data.filePath);
         })
     );
