@@ -64,7 +64,7 @@ export async function downloadBinaries(
             });
             await fs.unlink(data.zipPath);
             if (detectPlatform().startsWith("linux"))
-                await fs.chmod(data.tempFilePath, "+x");
+                await fs.chmod(data.tempFilePath, 755);
             await fs.rename(data.tempFilePath, data.filePath);
         })
     );

@@ -127,7 +127,7 @@ async function downloadBinaries({
       });
       await import_promises2.default.unlink(data.zipPath);
       if (detectPlatform().startsWith("linux"))
-        await import_promises2.default.chmod(data.tempFilePath, "+x");
+        await import_promises2.default.chmod(data.tempFilePath, 755);
       await import_promises2.default.rename(data.tempFilePath, data.filePath);
     })
   );
